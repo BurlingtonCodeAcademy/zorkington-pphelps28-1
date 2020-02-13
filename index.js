@@ -38,10 +38,14 @@ async function start() {
   //creates instances of Room class
   let entrance = new Room('entrance', 'The first room in the house', [], 'foyer', false, 'exit', false)
   entrance.south.locked = true
-  let foyer = new Room('foyer', 'A small and dirty mudroom', ['boots'], 'mainHall', false, 'entrance', false)
+  let foyer = new Room('foyer', 'A small and dirty mudroom', ['boots', 'coin'], 'mainHall', false, 'entrance', false)
   let mainHall = new Room('mainHall', 'The Main hall! Big staircase and stuff', ['phonebook', 'phone'], 'upstairsHall', 'kitchen', 'foyer', 'lounge')
   mainHall.west.locked = true
   let upstairsHall = new Room('upstairsHall', 'The top of the stairs', ['light switch 1', 'light switch 2'], 'bedroom', false, 'mainHall', false)
+  let kitchen = new Room('kitchen', 'Dusty, old kitchen full of rats and spiders', ['coin'], 'pantry', false, false, 'mainHall')
+  let pantry = new Room('pantry', 'Closet with untouched, probably expired food', ['Werther\'s Originals', 'Prune Juice', 'Bran Cereal'], false, false, 'kitchen', false)
+  let bedroom = new Room('bedroom', 'Scary looking bedroom with broken windows and a dead man lying in the bed', [], false, false, 'upstairsHall', false)
+  let lounge = new Room('lounge', 'Room with a bar and a pool table', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
   //player object, mutable
   let player = {
     name: 'PlayerOne',
@@ -58,8 +62,10 @@ async function start() {
     'foyer': foyer,
     'mainHall': mainHall,
     'upstairsHall': upstairsHall,
-    //'kitchen': kitchen,
-    //'lounge': lounge,
+    'kitchen': kitchen,
+    'pantry': pantry,
+    'bedroom': bedroom,
+    'lounge': lounge
   }
   //Introduction stuff! where the game 'starts'
   //answer response function
