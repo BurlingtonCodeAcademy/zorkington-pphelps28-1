@@ -82,9 +82,23 @@ async function start() {
         console.log(`You picked up ${item}`)
         player.inventory.push(item)
         lookUpTable[player.currentRoom].inventory = lookUpTable[player.currentRoom].inventory.filter(e => e != item)
+      return prompt()
       }
+      else console.log(`I don't see the ${item}`)
+      return prompt()
     }
     //drop function
+    if (answer.includes('drop')) {
+      let item = answer.split('').slice(4).join('').trim() 
+      if (player.inventory.includes(item)) {
+        console.log(`You dropped ${item}`)
+        lookUpTable[player.currentRoom].inventory.push(player.inventory.splice(player.inventory.indexOf(item),1)[0])
+      return prompt()
+      }
+      else console.log(`Can't drop what you don't got Dingus`)
+      return prompt()
+    }
+    //arr2.push(arr.splice(arr.indexOf('item),1)[0])
     else while (!ansArray.includes(answer)) {
       console.log(chalk.redBright(`\nSorry, I don't know what you mean by "${answer}"\n`))
       return prompt()
