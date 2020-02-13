@@ -61,37 +61,32 @@ async function start() {
     //'kitchen': kitchen,
     //'lounge': lounge,
   }
-  //Introduction stuff! where the game 'starts'
-  //answer response function
+
   prompt()
   async function prompt() {
-    //console.log(player)
     console.log(chalk.green('\ncurrenty in: ' + player.currentRoom))
     console.log(chalk.blue(`\n${lookUpTable[player.currentRoom].description}\n`))
+    console.log(`player's inventory: ${player.inventory}`)
     console.log(lookUpTable[player.currentRoom])
-
     let answer = await ask('\nWhere are you going?\n');
     answer = answer.trim().toLowerCase()
-    while (!ansArray.includes(answer)) {
+    if (answer.includes('pick up')) {
+      let item = answer.split('').slice(7).join('').trim()
+      if (lookUpTable[player.currentRoom].inventory.includes(item)) {
+        console.log(`You picked up ${item}`)
+        player.inventory.push(item)
+        lookUpTable[player.currentRoom].inventory = lookUpTable[player.currentRoom].inventory.filter(e => e != item)
+      }
+    }
+    //drop function
+    else while (!ansArray.includes(answer)) {
       console.log(chalk.redBright(`\nSorry, I don't know what you mean by "${answer}"\n`))
       return prompt()
-    }
+    }// check move logic to bar locked doors
     if (moveArr.includes(answer) && lookUpTable[player.currentRoom][answer].room !== false) {
       player.currentRoom = lookUpTable[player.currentRoom][answer].room
       return prompt()
     }
-    // if (answer = "east" && lookUpTable[player.currentRoom].east !== false) {
-    //   player.currentRoom = lookUpTable[player.currentRoom].east.room
-    //   console.log(`${lookUpTable[player.currentRoom].description}`)
-    // }
-    //if (answer === "south") {
-    //  player.currentRoom = lookUpTable[player.currentRoom].south.room
-    //  return prompt()
-    //}
-    // if (answer = "west" && lookUpTable[player.currentRoom].west !== false) {
-    //   player.currentRoom = lookUpTable[player.currentRoom].west.room
-    //   console.log(`${lookUpTable[player.currentRoom].description}`)
-    // }
     return prompt()
   }
 }
