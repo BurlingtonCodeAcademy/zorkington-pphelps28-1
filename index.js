@@ -48,12 +48,21 @@ mainHall.west.locked = true
 mainHall.west.description = `\nIt's super locked.  PERHAPS A KEY WOULD HELP\n`
 let upstairsHall = new Room('upstairsHall', 'The top of the stairs', [], 'bedroom', false, 'mainHall', false)
 let kitchen = new Room('kitchen', 'Dusty, old kitchen full of rats and spiders', ['coin'], 'pantry', false, false, 'mainHall')
-let pantry = new Room('pantry', 'Closet with untouched, probably expired food', ['Werther\'s Originals', 'Prune Juice', 'Bran Cereal'], false, false, 'kitchen', false)
+let pantry = new Room('pantry', 'Closet with untouched, probably expired food', ['Werther\'s Originals', 'prune juice', 'Bran Cereal'], false, false, 'kitchen', false)
 let bedroom = new Room('bedroom', 'Scary looking bedroom with broken windows and a dead man lying in the bed', [], false, false, 'upstairsHall', false)
 let lounge = new Room('lounge', 'Room with a bar and a pool table', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
+
 ///////////////////////////////////////////////////Item objects/////////////////////////////////////////////////////
 let boots = new Item('boots', "A pair of boots covered in dry, cracked mud")
-let coin = new Item('coin', 'a dull gold goin.  kinda spooky.')
+let coin = new Item('coin', 'A dull gold goin.  kinda spooky.')
+let phonebook = new Item('phonebook', 'A phonebook (a relic from a long time ago used for short people to sit on) that appears to have a note sticking out a little')
+let phone = new Item('phone', 'An old phone with a dial on the front')
+let werthers = new Item('Werther\'s Originals', 'A hard, caramel candy that starts getting sent to you when you turn 60')
+let pruneJuice = new Item('prune juice', 'Gross')
+let corpseKey = new Item('corpse key', 'small key')
+let frontEntranceKey = new Item('front entrance key', 'large, heavy ornate key')
+let liquor = new Item('liquor', 'a dusty bottle of scotch sitting on the bar')
+let poolCue = new Item('pool cue', 'wooden pool cue leaning on the pool table')
 //////////////////////////////////////////////////Player Object//////////////////////////////////////////////////////
 let player = {
   name: 'PlayerOne',
@@ -76,7 +85,16 @@ let lookUpTable = {
 const itemLookUp = {
   'boots': boots,
   'coin': coin,
+  'phonebook': phonebook,
+  'phone': phone,
+  'Werther\'s Originals': werthers,
+  'prune juice': pruneJuice,
+  'corpse key': corpseKey,
+  'front entrance key': frontEntranceKey,
+  'liquor': liquor,
+  'pool cue': poolCue
 }
+
 /////////////////////////////////////Reference arrays (for valid commands)///////////////////////////////////////////
 let ansArray = ['north', 'east', 'south', 'west', 'inventory', 'i', 'inspect']
 let moveArr = ['north', 'east', 'south', 'west']
