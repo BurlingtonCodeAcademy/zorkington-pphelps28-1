@@ -133,7 +133,7 @@ async function start() {
         return prompt()
       }
       if (player.inventory.includes(item) && item === 'coin' && player.currentRoom === 'bedroom') {
-        console.log('Success condition')
+        console.log(chalk.bgBlueBright(`You place a coin on the corpses eye.\nYou swear you feel some breath escape it's lungs\n`))
         return prompt()
       }
     }
@@ -177,7 +177,7 @@ async function start() {
     }
     if (moveArr.includes(answer) && lookUpTable[player.currentRoom][answer].room !== false) {
       if (lookUpTable[player.currentRoom][answer].locked == true) {
-        console.log(lookUpTable[player.currentRoom][answer].description)
+        console.log(chalk.redBright(lookUpTable[player.currentRoom][answer].description))
         return prompt()
       }
       else {
