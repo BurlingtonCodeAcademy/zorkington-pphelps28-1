@@ -39,18 +39,18 @@ let Item = class {
   }
 }
 /////////////////////////////////////////////////////Room Objects/////////////////////////////////////////
-let entrance = new Room('entrance', 'The first room in the house', [], 'foyer', false, 'exit', false)
+let entrance = new Room('entrance', 'A grand entrance with stone floors and an enormous, intricately carved door.', [], 'foyer', false, 'exit', false)
 entrance.south.locked = true
 entrance.south.description = `\nThe main entrance is locked.  You need to find a key\n`
-let foyer = new Room('foyer', 'A small and dirty mudroom', ['boots', 'coin'], 'mainHall', false, 'entrance', false)
-let mainHall = new Room('mainHall', 'The Main hall! Big staircase and stuff', ['phonebook', 'phone'], 'upstairsHall', 'kitchen', 'foyer', 'lounge')
+let foyer = new Room('foyer', 'A small arched hallway that opens up to the rest of the mansion.', ['boots', 'coin'], 'mainHall', false, 'entrance', false)
+let mainHall = new Room('mainHall', 'A giant room with cathedral ceiling, a delapidated chandelier hanging in the center and a grand staircase.', ['phonebook', 'phone'], 'upstairsHall', 'kitchen', 'foyer', 'lounge')
 mainHall.west.locked = true
 mainHall.west.description = `\nIt's super locked.  PERHAPS A KEY WOULD HELP\n`
-let upstairsHall = new Room('upstairsHall', 'The top of the stairs', [], 'bedroom', false, 'mainHall', false)
-let kitchen = new Room('kitchen', 'Dusty, old kitchen full of rats and spiders', ['coin'], 'pantry', false, false, 'mainHall')
+let upstairsHall = new Room('upstairsHall', 'Hall at the top of the stairs leading to the bedroom', [], 'bedroom', false, 'mainHall', false)
+let kitchen = new Room('kitchen', 'Dusty, old kitchen full of rats and spiders with dishes and utensils left like they were suddenly abandoned', ['coin'], 'pantry', false, false, 'mainHall')
 let pantry = new Room('pantry', 'Closet with untouched, probably expired food', ['Werther\'s Originals', 'prune juice', 'Bran Cereal'], false, false, 'kitchen', false)
-let bedroom = new Room('bedroom', 'Scary looking bedroom with broken windows and a dead man lying in the bed', [], false, false, 'upstairsHall', false)
-let lounge = new Room('lounge', 'Room with a bar and a pool table', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
+let bedroom = new Room('bedroom', 'Scary looking bedroom with broken windows and a corpse lying in the four-post bed in the center of the room', [], false, false, 'upstairsHall', false)
+let lounge = new Room('lounge', 'A one-time classy loung with an enormous bar, bookshelves, a fireplace and a billiards table.', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
 
 ///////////////////////////////////////////////////Item objects/////////////////////////////////////////////////////
 let boots = new Item('boots', "A pair of boots covered in dry, cracked mud")
