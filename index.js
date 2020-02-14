@@ -48,19 +48,20 @@ mainHall.west.locked = true
 mainHall.west.description = `\nIt's super locked.  PERHAPS A KEY WOULD HELP\n`
 let upstairsHall = new Room('upstairsHall', 'Hall at the top of the stairs leading to the bedroom', [], 'bedroom', false, 'mainHall', false)
 let kitchen = new Room('kitchen', 'Dusty, old kitchen full of rats and spiders with dishes and utensils left like they were suddenly abandoned', ['coin'], 'pantry', false, false, 'mainHall')
-let pantry = new Room('pantry', 'Closet with untouched, probably expired food', ['Werther\'s Originals', 'prune juice', 'Bran Cereal'], false, false, 'kitchen', false)
+let pantry = new Room('pantry', 'Closet with untouched, probably expired food', ['werther\'s originals', 'prune juice', 'Bran Cereal'], false, false, 'kitchen', false)
 let bedroom = new Room('bedroom', 'Scary looking bedroom with broken windows and a corpse lying in the four-post bed in the center of the room', [], false, false, 'upstairsHall', false)
 let lounge = new Room('lounge', 'A one-time classy lounge with an enormous bar, bookshelves, a fireplace and a billiards table.', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
-
+let exit = new Room('exit', 'SUCCESS! FREEDOM!! SWEET, SWEET FREEDOM!!!!', [], 'entrance', false, false, false)
 ///////////////////////////////////////////////////Item objects/////////////////////////////////////////////////////
 let boots = new Item('boots', "A pair of boots covered in dry, cracked mud")
 let coin = new Item('coin', 'A dull gold goin.  kinda spooky.')
-let phonebook = new Item('phonebook', 'A phonebook (a relic from a long time ago used for short people to sit on) that appears to have a note sticking out a little')
+let phonebook = new Item('phonebook', 'A phonebook (a relic from a long time ago used for short people to sit on) that appears to have a note sticking out a little (note added to inventory)')
+phonebook.inspected = false
 let phone = new Item('phone', 'An old phone with a dial on the front')
-let werthers = new Item('Werther\'s Originals', 'A hard, caramel candy that starts getting sent to you when you turn 60')
+let werthers = new Item('werther\'s originals', 'A hard, caramel candy that starts getting sent to you when you turn 60')
 let pruneJuice = new Item('prune juice', 'Gross')
 let corpseKey = new Item('corpse key', 'A small key')
-let frontEntranceKey = new Item('front entrance key', 'A large, heavy ornate key')
+let frontEntranceKey = new Item('front entrance key', 'A large, heavy ornate key.  Label says, "FRONT ENTRANCE"\nCould be your ticket out of here...')
 let liquor = new Item('liquor', 'A dusty bottle of scotch sitting on the bar')
 let poolCue = new Item('pool cue', 'A wooden pool cue leaning on the pool table')
 let note = new Item('note', 'A folded piece of paper with text that reads:\nPlace the coins where he weeps\nand his soul forever sleeps')
@@ -80,7 +81,8 @@ let lookUpTable = {
   'kitchen': kitchen,
   'pantry': pantry,
   'bedroom': bedroom,
-  'lounge': lounge
+  'lounge': lounge,
+  'exit': exit
 }
 //////////////////////////////////////////////////Item lookup table//////////////////////////////////////////////////
 const itemLookUp = {
@@ -91,15 +93,16 @@ const itemLookUp = {
   'werther\'s originals': werthers,
   'prune juice': pruneJuice,
   'corpse key': corpseKey,
-  'front entrance key': frontEntranceKey,
+  'key': frontEntranceKey,
   'liquor': liquor,
   'pool cue': poolCue,
-  'note': note
+  'note': note,
 }
 
 /////////////////////////////////////Reference arrays (for valid commands)///////////////////////////////////////////
 let ansArray = ['north', 'east', 'south', 'west', 'inventory', 'i', 'inspect', 'commands', 'c', 'examine room']
 let moveArr = ['north', 'east', 'south', 'west']
+let coinArr = []
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 start();
 async function start() {
@@ -124,7 +127,6 @@ async function start() {
   async function prompt() {
     console.log(chalk.green('You are currently in the ' + lookUpTable[player.currentRoom].name))
     console.log(chalk.yellowBright(lookUpTable[player.currentRoom].description))
-    console.log(player.currentRoom)
     let answer = await ask('\nWhat do you want to do?\n');
     answer = answer.trim().toLowerCase()
     //use function
@@ -134,8 +136,27 @@ async function start() {
         console.log(chalk.redBright(`\nYou don't have ${item}`))
         return prompt()
       }
+      if (player.inventory.includes(item) && item === 'corpse key' && player.currentRoom === 'mainHall') {
+        mainHall.west.locked = false
+        console.log(chalk.blueBright(`\nYou hear a *click*.  The door appears to be unlocked!`))
+        return prompt()
+      }
       if (player.inventory.includes(item) && item === 'coin' && player.currentRoom === 'bedroom') {
-        console.log(chalk.bgBlueBright(`You place a coin on the corpses eye.\nYou swear you feel some breath escape it's lungs\n`))
+        coinArr.push('coin')
+        console.log(coinArr.length)
+        lookUpTable[player.currentRoom].description = 'Scary looking bedroom with broken windows and a corpse with a coin on one eye lying in the four-post bed in the center of the room'
+        player.inventory.splice(player.inventory.indexOf('coin'), 1)
+        if (coinArr.length === 2) {
+          console.log(chalk.blueBright(`You place the second coin on the corpse's remaining eye.\nIt's mouth slowly opens, revealing a key.\n`))
+          lookUpTable[player.currentRoom].inventory.push('corpse key')
+          return prompt()
+        }
+        console.log(chalk.blueBright(`You place a coin on the corpses eye.\nYou swear you feel some breath escape it's lungs\n`))
+        return prompt()
+      }
+      if (player.inventory.includes(item) && player.currentRoom === 'entrance' && item === 'key') {
+        entrance.south.locked = false
+        console.log(chalk.blueBright(`The key fits perfectly.  You turn it, and unlock the door with a satisfying *click*`))
         return prompt()
       }
     }
@@ -165,6 +186,15 @@ async function start() {
     // inspect function
     if (answer.includes('inspect')) {
       let item = answer.slice(7).trim()
+      if (player.inventory.includes(item) && item === 'phonebook') {
+        if (itemLookUp[item].inspected === false) {
+          console.log(chalk.blueBright(itemLookUp[item].description))
+          player.inventory.push('note')
+          itemLookUp[item].description = 'A phonebook(a relic from a long time ago used for short people to sit on)'
+          itemLookUp[item].inspected = true
+          return prompt()
+        }
+      }
       if (player.inventory.includes(item)) {
         console.log('\n' + chalk.blueBright(itemLookUp[item].description) + '\n')
       } else if (item == '') {
@@ -173,9 +203,11 @@ async function start() {
       } else console.log(chalk.redBright(`\nYou can't inspect the ${item} because you don't have the ${item}\n`))
       return prompt()
     }
+
     //move function (checks if room is locked, or if it exists at all)
     if (moveArr.includes(answer) && lookUpTable[player.currentRoom][answer].room == false) {
       console.log(chalk.redBright(`\nSorry, you can't go ${answer}.  There's like, nothing there.\n`))
+      return prompt()
     }
     if (moveArr.includes(answer) && lookUpTable[player.currentRoom][answer].room !== false) {
       if (lookUpTable[player.currentRoom][answer].locked == true) {
@@ -184,6 +216,11 @@ async function start() {
       }
       else {
         player.currentRoom = lookUpTable[player.currentRoom][answer].room
+        if (player.currentRoom === 'exit') {
+          console.log(chalk.cyanBright(`Fresh air greets your lungs.  You've escaped.  You're safe. For now...\nOr something, whatever.  Sorry you had to play this.`))
+          console.log('\nTHANKS FOR PLAYING!!!!')
+          process.exit()
+        }
         return prompt()
       }
     }
