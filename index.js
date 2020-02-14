@@ -122,8 +122,21 @@ async function start() {
   async function prompt() {
     console.log(chalk.green('You are currently in the ' + lookUpTable[player.currentRoom].name))
     console.log(chalk.yellowBright(lookUpTable[player.currentRoom].description))
+    console.log(player.currentRoom)
     let answer = await ask('\nWhat do you want to do?\n');
     answer = answer.trim().toLowerCase()
+    //use function
+    if (answer.includes(`use`)) {
+      let item = answer.split('').slice(3).join('').trim()
+      if (!player.inventory.includes(item)) {
+        console.log(chalk.redBright(`\nYou don't have ${item}`))
+        return prompt()
+      }
+      if (player.inventory.includes(item) && item === 'coin' && player.currentRoom === 'bedroom') {
+        console.log('Success condition')
+        return prompt()
+      }
+    }
     //pick up function
     if (answer.includes('pick up')) {
       let item = answer.split('').slice(7).join('').trim()
@@ -204,8 +217,8 @@ async function start() {
       console.log(chalk.yellowBright(`\nWhile in the ${chalk.blueBright(lookUpTable[player.currentRoom].name)}, you see the following things of note:\n`))
       for (let i of lookUpTable[player.currentRoom].inventory) {
         console.log(`${i}\n`)
-        return prompt()
       }
+      return prompt()
     }
     //throw function
     else while (!ansArray.includes(answer)) {
