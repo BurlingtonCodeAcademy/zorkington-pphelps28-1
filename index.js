@@ -1,6 +1,16 @@
 const readline = require('readline');
 const chalk = require('chalk')
 const readlineInterface = readline.createInterface(process.stdin, process.stdout);
+const fs = require('fs');
+const lines = fs.readFileSync('./read.txt')
+
+// sleep function to slow down line drawing
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// drawing the lines
+
 
 function ask(questionText) {
   return new Promise((resolve, reject) => {
@@ -39,19 +49,19 @@ let Item = class {
   }
 }
 /////////////////////////////////////////////////////Room Objects/////////////////////////////////////////
-let entrance = new Room('entrance', 'A grand entrance with stone floors and an enormous, intricately carved door.', [], 'foyer', false, 'exit', false)
+let entrance = new Room('Entrance', 'A grand entrance with stone floors and an enormous, intricately carved door.', [], 'foyer', false, 'exit', false)
 entrance.south.locked = true
 entrance.south.description = `\nThe main entrance is locked.  You need to find a key\n`
-let foyer = new Room('foyer', 'A small arched hallway that opens up to the rest of the mansion.', ['boots', 'coin'], 'mainHall', false, 'entrance', false)
-let mainHall = new Room('mainHall', 'A giant room with cathedral ceiling, a delapidated chandelier hanging in the center and a grand staircase.', ['phonebook', 'phone'], 'upstairsHall', 'kitchen', 'foyer', 'lounge')
+let foyer = new Room('Foyer', 'A small arched hallway that opens up to the rest of the mansion.', ['boots', 'coin'], 'mainHall', false, 'entrance', false)
+let mainHall = new Room('Main Hall', 'A giant room with cathedral ceiling, a delapidated chandelier hanging in the center and a grand staircase.', ['phonebook', 'phone'], 'upstairsHall', 'kitchen', 'foyer', 'lounge')
 mainHall.west.locked = true
 mainHall.west.description = `\nIt's super locked.  PERHAPS A KEY WOULD HELP\n`
-let upstairsHall = new Room('upstairsHall', 'Hall at the top of the stairs leading to the bedroom', [], 'bedroom', false, 'mainHall', false)
-let kitchen = new Room('kitchen', 'Dusty, old kitchen full of rats and spiders with dishes and utensils left like they were suddenly abandoned', ['coin'], 'pantry', false, false, 'mainHall')
-let pantry = new Room('pantry', 'Closet with untouched, probably expired food', ['werther\'s originals', 'prune juice', 'Bran Cereal'], false, false, 'kitchen', false)
-let bedroom = new Room('bedroom', 'Scary looking bedroom with broken windows and a corpse lying in the four-post bed in the center of the room', [], false, false, 'upstairsHall', false)
-let lounge = new Room('lounge', 'A one-time classy lounge with an enormous bar, bookshelves, a fireplace and a billiards table.', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
-let exit = new Room('exit', 'SUCCESS! FREEDOM!! SWEET, SWEET FREEDOM!!!!', [], 'entrance', false, false, false)
+let upstairsHall = new Room('Upstairs Hall', 'Hall at the top of the stairs leading to the bedroom', [], 'bedroom', false, 'mainHall', false)
+let kitchen = new Room('Kitchen', 'Dusty, old kitchen full of rats and spiders with dishes and utensils left like they were suddenly abandoned', ['coin'], 'pantry', false, false, 'mainHall')
+let pantry = new Room('Pantry', 'Closet with untouched, probably expired food', ['werther\'s originals', 'prune juice', 'Bran Cereal'], false, false, 'kitchen', false)
+let bedroom = new Room('Bedroom', 'Scary looking bedroom with broken windows and a corpse lying in the four-post bed in the center of the room', [], false, false, 'upstairsHall', false)
+let lounge = new Room('Lounge', 'A one-time classy lounge with an enormous bar, bookshelves, a fireplace and a billiards table.', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
+let exit = new Room('Exit', 'SUCCESS! FREEDOM!! SWEET, SWEET FREEDOM!!!!', [], 'entrance', false, false, false)
 ///////////////////////////////////////////////////Item objects/////////////////////////////////////////////////////
 let boots = new Item('boots', "A pair of boots covered in dry, cracked mud")
 let coin = new Item('coin', 'A dull gold goin.  kinda spooky.')
@@ -106,9 +116,10 @@ let coinArr = []
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 start();
 async function start() {
+  console.log(chalk.gray('\n' + lines + '\n'))
 
   //////////////////////////////////////////Game Start////////////////////////////////////////////////////////////////
-  let name = await ask("\nWhat's your name?\n")
+  let name = await ask("\nBefore we get started...What's your name?\n")
   if (name) {
     console.log(`\nYou entered: ${name}.\n`)
     let ans = await ask('Are you sure? (y/n)')
@@ -123,9 +134,10 @@ async function start() {
       return start()
     }
   }
+
   //////////////////////////////////////////////User Inputs////////////////////////////////////////////////////////////
   async function prompt() {
-    console.log(chalk.green('You are currently in the ' + lookUpTable[player.currentRoom].name))
+    console.log(chalk.green('You are currently in the ' + chalk.blueBright(lookUpTable[player.currentRoom].name)))
     console.log(chalk.yellowBright(lookUpTable[player.currentRoom].description))
     let answer = await ask('\nWhat do you want to do?\n');
     answer = answer.trim().toLowerCase()
@@ -138,12 +150,11 @@ async function start() {
       }
       if (player.inventory.includes(item) && item === 'corpse key' && player.currentRoom === 'mainHall') {
         mainHall.west.locked = false
-        console.log(chalk.blueBright(`\nYou hear a *click*.  The door appears to be unlocked!`))
+        console.log(chalk.blueBright(`\nYou hear a *click*.  The door appears to be unlocked!\n`))
         return prompt()
       }
       if (player.inventory.includes(item) && item === 'coin' && player.currentRoom === 'bedroom') {
         coinArr.push('coin')
-        console.log(coinArr.length)
         lookUpTable[player.currentRoom].description = 'Scary looking bedroom with broken windows and a corpse with a coin on one eye lying in the four-post bed in the center of the room'
         player.inventory.splice(player.inventory.indexOf('coin'), 1)
         if (coinArr.length === 2) {
@@ -250,7 +261,7 @@ async function start() {
     //examine room function
     if (answer === "examine room") {
       if (lookUpTable[player.currentRoom].inventory.length == 0) {
-        console.log(chalk.yellowBright(`\nNothing of note in the ${player.currentRoom}\n`))
+        console.log(chalk.yellowBright(`\nNothing of note in the ${chalk.blueBright(lookUpTable[player.currentRoom].name)}\n`))
         return prompt()
       }
       console.log(chalk.yellowBright(`\nWhile in the ${chalk.blueBright(lookUpTable[player.currentRoom].name)}, you see the following things of note:\n`))
@@ -268,6 +279,7 @@ async function start() {
   }
 }
 
-
-//updated room descriptions 
-//unique conditionals
+//intro text scroll
+//lose condition
+//textwrap
+//'can't use that here
