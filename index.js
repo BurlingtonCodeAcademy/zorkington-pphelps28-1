@@ -39,18 +39,18 @@ let Item = class {
   }
 }
 /////////////////////////////////////////////////////Room Objects/////////////////////////////////////////
-let entrance = new Room('Entrance', 'The first room in the house', [], 'foyer', false, 'exit', false)
+let entrance = new Room('entrance', 'A grand entrance with stone floors and an enormous, intricately carved door.', [], 'foyer', false, 'exit', false)
 entrance.south.locked = true
 entrance.south.description = `\nThe main entrance is locked.  You need to find a key\n`
-let foyer = new Room('Foyer', 'A small and dirty mudroom', ['boots', 'coin'], 'mainHall', false, 'entrance', false)
-let mainHall = new Room('Main Hall', 'The Main hall! Big staircase and stuff', ['phonebook', 'phone'], 'upstairsHall', 'kitchen', 'foyer', 'lounge')
+let foyer = new Room('foyer', 'A small arched hallway that opens up to the rest of the mansion.', ['boots', 'coin'], 'mainHall', false, 'entrance', false)
+let mainHall = new Room('mainHall', 'A giant room with cathedral ceiling, a delapidated chandelier hanging in the center and a grand staircase.', ['phonebook', 'phone'], 'upstairsHall', 'kitchen', 'foyer', 'lounge')
 mainHall.west.locked = true
 mainHall.west.description = `\nIt's super locked.  PERHAPS A KEY WOULD HELP\n`
-let upstairsHall = new Room('Upstairs Hall', 'The top of the stairs', [], 'bedroom', false, 'mainHall', false)
-let kitchen = new Room('Kitchen', 'Dusty, old kitchen full of rats and spiders', ['coin'], 'pantry', false, false, 'mainHall')
-let pantry = new Room('Pantry', 'Closet with untouched, probably expired food', ['werther\'s originals', 'prune juice', 'bran cereal'], false, false, 'kitchen', false)
-let bedroom = new Room('Bedroom', 'Scary looking bedroom with broken windows and a dead man lying in the bed', [], false, false, 'upstairsHall', false)
-let lounge = new Room('Lounge', 'Room with a bar and a pool table', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
+let upstairsHall = new Room('upstairsHall', 'Hall at the top of the stairs leading to the bedroom', [], 'bedroom', false, 'mainHall', false)
+let kitchen = new Room('kitchen', 'Dusty, old kitchen full of rats and spiders with dishes and utensils left like they were suddenly abandoned', ['coin'], 'pantry', false, false, 'mainHall')
+let pantry = new Room('pantry', 'Closet with untouched, probably expired food', ['Werther\'s Originals', 'prune juice', 'Bran Cereal'], false, false, 'kitchen', false)
+let bedroom = new Room('bedroom', 'Scary looking bedroom with broken windows and a corpse lying in the four-post bed in the center of the room', [], false, false, 'upstairsHall', false)
+let lounge = new Room('lounge', 'A one-time classy lounge with an enormous bar, bookshelves, a fireplace and a billiards table.', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
 
 ///////////////////////////////////////////////////Item objects/////////////////////////////////////////////////////
 let boots = new Item('boots', "A pair of boots covered in dry, cracked mud")
@@ -59,10 +59,11 @@ let phonebook = new Item('phonebook', 'A phonebook (a relic from a long time ago
 let phone = new Item('phone', 'An old phone with a dial on the front')
 let werthers = new Item('Werther\'s Originals', 'A hard, caramel candy that starts getting sent to you when you turn 60')
 let pruneJuice = new Item('prune juice', 'Gross')
-let corpseKey = new Item('corpse key', 'small key')
-let frontEntranceKey = new Item('front entrance key', 'large, heavy ornate key')
-let liquor = new Item('liquor', 'a dusty bottle of scotch sitting on the bar')
-let poolCue = new Item('pool cue', 'wooden pool cue leaning on the pool table')
+let corpseKey = new Item('corpse key', 'A small key')
+let frontEntranceKey = new Item('front entrance key', 'A large, heavy ornate key')
+let liquor = new Item('liquor', 'A dusty bottle of scotch sitting on the bar')
+let poolCue = new Item('pool cue', 'A wooden pool cue leaning on the pool table')
+let note = new Item('note', 'A folded piece of paper with text that reads:\nPlace the coins where he weeps\nand his soul forever sleeps')
 //////////////////////////////////////////////////Player Object//////////////////////////////////////////////////////
 let player = {
   name: 'PlayerOne',
@@ -92,7 +93,8 @@ const itemLookUp = {
   'corpse key': corpseKey,
   'front entrance key': frontEntranceKey,
   'liquor': liquor,
-  'pool cue': poolCue
+  'pool cue': poolCue,
+  'note': note
 }
 
 /////////////////////////////////////Reference arrays (for valid commands)///////////////////////////////////////////
