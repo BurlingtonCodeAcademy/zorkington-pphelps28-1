@@ -79,7 +79,7 @@ mainHall.west.locked = true
 mainHall.west.description = `\nIt's super locked.  PERHAPS A KEY WOULD HELP\n`
 let upstairsHall = new Room('Upstairs Hall', 'Hall at the top of the stairs leading to the bedroom', [], 'bedroom', false, 'mainHall', false)
 let kitchen = new Room('Kitchen', 'Dusty, old kitchen full of rats and spiders with dishes and utensils left like they were suddenly abandoned', ['coin'], 'pantry', false, false, 'mainHall')
-let pantry = new Room('Pantry', 'Closet with untouched, probably expired food', ['werther\'s originals', 'prune juice', 'Bran Cereal'], false, false, 'kitchen', false)
+let pantry = new Room('Pantry', 'Closet with untouched, probably expired food', ['werther\'s originals', 'prune juice', 'bran cereal'], false, false, 'kitchen', false)
 let bedroom = new Room('Bedroom', 'Scary looking bedroom with broken windows and a corpse lying in the four-post bed in the center of the room', [], false, false, 'upstairsHall', false)
 let lounge = new Room('Lounge', 'A one-time classy lounge with an enormous bar, bookshelves, a fireplace and a billiards table.', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
 let exit = new Room('Exit', 'SUCCESS! FREEDOM!! SWEET, SWEET FREEDOM!!!!', [], 'entrance', false, false, false)
@@ -97,6 +97,7 @@ let liquor = new Item('liquor', 'A dusty bottle of scotch sitting on the bar')
 let poolCue = new Item('pool cue', 'A wooden pool cue leaning on the pool table')
 let note = new Item('note', 'A folded piece of paper with text that reads:\nPlace the coins where he weeps\nand his soul forever sleeps')
 let map = new Item('map', mapText)
+let branCereal = new Item('bran cereal', 'lots of stuff to keep the body happy.  and like, really regular')
 //////////////////////////////////////////////////Player Object//////////////////////////////////////////////////////
 let player = {
   name: 'PlayerOne',
@@ -129,7 +130,8 @@ const itemLookUp = {
   'liquor': liquor,
   'pool cue': poolCue,
   'note': note,
-  'map': map
+  'map': map,
+  'bran cereal': branCereal
 }
 
 /////////////////////////////////////Reference arrays (for valid commands)///////////////////////////////////////////
@@ -261,7 +263,7 @@ async function start() {
         player.currentRoom = lookUpTable[player.currentRoom][answer].room
         if (player.currentRoom === 'exit') {
           console.log(chalk.cyanBright(`Fresh air greets your lungs.  You've escaped.  You're safe. For now...\nOr something, whatever.  Sorry you had to play this.`))
-          console.log(`\nTHANKS, ${player.name.toUpperCase()} !!!!`)
+          console.log(`\nTHANKS, ${player.name.toUpperCase()}!!!!`)
           process.exit()
         }
         return prompt()
