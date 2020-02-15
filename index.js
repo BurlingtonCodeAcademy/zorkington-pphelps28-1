@@ -1,8 +1,9 @@
+/////////////////////////////////////Modules/////////////////////////////////
 const readline = require('readline');
 const chalk = require('chalk')
 const readlineInterface = readline.createInterface(process.stdin, process.stdout);
 const fs = require('fs');
-//////////////////////intro text///////////////////////////////
+//////////////////////Intro and map text///////////////////////////////
 const lines = fs.readFileSync('./read.txt').toString()
 const mapText = fs.readFileSync('./map.txt').toString()
 
@@ -14,6 +15,7 @@ function ask(questionText) {
 }
 ////////////////////////////TextWrap Function//////////////////////////////////////////////////////////////////
 ///////takes string as argument, creates an array of formatted lines, and iterates/logs them
+//second argument accepts a string based on the chalk module's style properties
 function textWrap(str, chalkStyle) {
   function readArray(array) {
     for (let line of array) {
@@ -138,10 +140,12 @@ const itemLookUp = {
 let ansArray = ['north', 'east', 'south', 'west', 'inventory', 'i', 'inspect', 'commands', 'c', 'examine room']
 let moveArr = ['north', 'east', 'south', 'west']
 let coinArr = []
+let count = 0
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 start();
 async function start() {
   //////////////////////////////////////////Game Start////////////////////////////////////////////////////////////////
+  //AskName function bars progresss until user agrees to name input
   askName()
   async function askName() {
     let name = await ask("\nNow then...What's your name?\n")
@@ -161,8 +165,8 @@ async function start() {
       }
     }
   }
+  //////////////////////////////////////////////Gameplay////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////User Inputs////////////////////////////////////////////////////////////
   async function prompt() {
     console.log(chalk.green('\nYou are currently in the ' + chalk.blueBright(lookUpTable[player.currentRoom].name)))
     textWrap((lookUpTable[player.currentRoom].description), 'yellowBright')
@@ -173,6 +177,12 @@ async function start() {
       let item = answer.split('').slice(3).join('').trim()
       if (!player.inventory.includes(item)) {
         console.log(chalk.redBright(`\nYou don't have ${item}`))
+        return prompt()
+      }
+      if (player.inventory.includes('liquor') && item === 'liquor') {
+        textWrap((`The room starts to spin`), 'blueBright')
+        player.status = 'drunk'
+        player.drunkcount = 0
         return prompt()
       }
       if (player.inventory.includes(item) && item === 'corpse key' && player.currentRoom === 'mainHall') {
@@ -186,6 +196,7 @@ async function start() {
         player.inventory.splice(player.inventory.indexOf('coin'), 1)
         if (coinArr.length === 2) {
           console.log(chalk.blueBright(`You place the second coin on the corpse's remaining eye.\nIt's mouth slowly opens, revealing a key.\n`))
+          lookUpTable[player.currentRoom].description = 'Scary looking bedroom with broken windows and a corpse with a coin on each eye lying in the four-post bed in the center of the room'
           lookUpTable[player.currentRoom].inventory.push('corpse key')
           return prompt()
         }
@@ -255,14 +266,33 @@ async function start() {
       return prompt()
     }
     if (moveArr.includes(answer) && lookUpTable[player.currentRoom][answer].room !== false) {
+      //if room is locked, but it also exists
       if (lookUpTable[player.currentRoom][answer].locked == true) {
         console.log(chalk.redBright(lookUpTable[player.currentRoom][answer].description))
         return prompt()
       }
       else {
+        //if you're drunk, there's a <10%  you miss your move
+        if (player.status == 'drunk') {
+          let chance = Math.round(Math.random((15 - 1)) + 1)
+          if (chance == 1) {
+            textWrap('The liquor causes you to stumble into the wall, missing your mark.  Embarassing\n', 'blueBright')
+            player.drunkcount++
+            return prompt()
+          }
+          player.drunkcount++
+          if (player.drunkcount >= 5) {
+            console.log(`\nYour buzz has worn off`)
+            player.status = ''
+          }
+          //sets player to new room
+        }
         player.currentRoom = lookUpTable[player.currentRoom][answer].room
+        count++
+        //win condition
         if (player.currentRoom === 'exit') {
           console.log(chalk.cyanBright(`Fresh air greets your lungs.  You've escaped.  You're safe. For now...\nOr something, whatever.  Sorry you had to play this.`))
+          console.log(`You beat it in ${count} moves`)
           console.log(`\nTHANKS, ${player.name.toUpperCase()}!!!!`)
           process.exit()
         }
@@ -308,12 +338,7 @@ async function start() {
     else while (!ansArray.includes(answer)) {
       console.log(chalk.redBright(`\nSorry, I don't know what you mean by "${answer}"\n`))
       return prompt()
-    }// check move logic to bar locked doors
+    }
     return prompt()
   }
 }
-
-//intro text scroll
-//lose condition
-//textwrap
-//'can't use that here
