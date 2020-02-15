@@ -2,20 +2,41 @@ const readline = require('readline');
 const chalk = require('chalk')
 const readlineInterface = readline.createInterface(process.stdin, process.stdout);
 const fs = require('fs');
-const lines = fs.readFileSync('./read.txt')
+//////////////////////intro text///////////////////////////////
+const lines = fs.readFileSync('./read.txt').toString()
+const mapText = fs.readFileSync('./map.txt').toString()
 
-// sleep function to slow down line drawing
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// drawing the lines
-
-
+//////////////////////////////User Input Prompt//////////////////////////////////////////////
 function ask(questionText) {
   return new Promise((resolve, reject) => {
     readlineInterface.question(questionText, resolve);
   });
+}
+////////////////////////////TextWrap Function//////////////////////////////////////////////////////////////////
+///////takes string as argument, creates an array of formatted lines, and iterates/logs them
+function textWrap(str, chalkStyle) {
+  function readArray(array) {
+    for (let line of array) {
+      console.log(chalk[chalkStyle](line))
+    }
+    return
+  }
+  let num = Math.round(process.stdout.columns * .95)
+  let readArr = []
+  let resetNum = num
+  let targetNum = str.length
+  while (readArr.join('').length <= targetNum) {
+    if (str.length <= resetNum) {
+      readArr.push(str)
+      readArray(readArr)
+    }
+    while (str[num] != ' ' && str.length > num) {
+      num--
+    }
+    readArr.push(str.slice(0, num))
+    str = str.slice(num)
+    num = resetNum
+  }
 }
 
 ///////////////////////////////////////////////////////Classes///////////////////////////////////////////
@@ -49,7 +70,7 @@ let Item = class {
   }
 }
 /////////////////////////////////////////////////////Room Objects/////////////////////////////////////////
-let entrance = new Room('Entrance', 'A grand entrance with stone floors and an enormous, intricately carved door.', [], 'foyer', false, 'exit', false)
+let entrance = new Room('Entrance', 'A grand entrance with stone floors and an enormous, intricately carved door.  There is a map of the house on the wall, for some reason. convenient.', ['map'], 'foyer', false, 'exit', false)
 entrance.south.locked = true
 entrance.south.description = `\nThe main entrance is locked.  You need to find a key\n`
 let foyer = new Room('Foyer', 'A small arched hallway that opens up to the rest of the mansion.', ['boots', 'coin'], 'mainHall', false, 'entrance', false)
@@ -70,11 +91,12 @@ phonebook.inspected = false
 let phone = new Item('phone', 'An old phone with a dial on the front')
 let werthers = new Item('werther\'s originals', 'A hard, caramel candy that starts getting sent to you when you turn 60')
 let pruneJuice = new Item('prune juice', 'Gross')
-let corpseKey = new Item('corpse key', 'A small key')
+let corpseKey = new Item('corpse key', 'A small key found in the mouth of a decrepit corpse')
 let frontEntranceKey = new Item('front entrance key', 'A large, heavy ornate key.  Label says, "FRONT ENTRANCE"\nCould be your ticket out of here...')
 let liquor = new Item('liquor', 'A dusty bottle of scotch sitting on the bar')
 let poolCue = new Item('pool cue', 'A wooden pool cue leaning on the pool table')
 let note = new Item('note', 'A folded piece of paper with text that reads:\nPlace the coins where he weeps\nand his soul forever sleeps')
+let map = new Item('map', mapText)
 //////////////////////////////////////////////////Player Object//////////////////////////////////////////////////////
 let player = {
   name: 'PlayerOne',
@@ -107,6 +129,7 @@ const itemLookUp = {
   'liquor': liquor,
   'pool cue': poolCue,
   'note': note,
+  'map': map
 }
 
 /////////////////////////////////////Reference arrays (for valid commands)///////////////////////////////////////////
@@ -116,29 +139,31 @@ let coinArr = []
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 start();
 async function start() {
-  console.log(chalk.gray('\n' + lines + '\n'))
-
   //////////////////////////////////////////Game Start////////////////////////////////////////////////////////////////
-  let name = await ask("\nBefore we get started...What's your name?\n")
-  if (name) {
-    console.log(`\nYou entered: ${name}.\n`)
-    let ans = await ask('Are you sure? (y/n)')
-    if (ans === 'y') {
-      player.name = name
-      console.log(`\nHello, ${player.name}!\ntype "c" at any time for a list of valid commands\n`)
-      prompt()
-    } else if (ans === 'n') {
-      return start()
-    } else {
-      console.log(chalk.redBright('\nOk, wiseguy.\n'))
-      return start()
+  askName()
+  async function askName() {
+    let name = await ask("\nNow then...What's your name?\n")
+    if (name) {
+      console.log(`\nYou entered: ${name}.\n`)
+      let ans = await ask('Are you sure? (y/n)\n\n')
+      if (ans === 'y') {
+        player.name = name
+        textWrap((`\nHello, ${player.name}. type "c" at any time for a list of valid commands.  Now, let's begin.\n\n`), 'greenBright')
+        textWrap(lines, 'gray')
+        prompt()
+      } else if (ans === 'n') {
+        return askName()
+      } else {
+        console.log(chalk.redBright('\nOk, wiseguy.\n'))
+        return askName()
+      }
     }
   }
 
   //////////////////////////////////////////////User Inputs////////////////////////////////////////////////////////////
   async function prompt() {
-    console.log(chalk.green('You are currently in the ' + chalk.blueBright(lookUpTable[player.currentRoom].name)))
-    console.log(chalk.yellowBright(lookUpTable[player.currentRoom].description))
+    console.log(chalk.green('\nYou are currently in the ' + chalk.blueBright(lookUpTable[player.currentRoom].name)))
+    textWrap((lookUpTable[player.currentRoom].description), 'yellowBright')
     let answer = await ask('\nWhat do you want to do?\n');
     answer = answer.trim().toLowerCase()
     //use function
@@ -178,6 +203,9 @@ async function start() {
         console.log(`\nYou picked up ${item}\n`)
         player.inventory.push(item)
         lookUpTable[player.currentRoom].inventory = lookUpTable[player.currentRoom].inventory.filter(e => e != item)
+        if (!lookUpTable.entrance.inventory.includes('map')) {
+          lookUpTable.entrance.description = 'A grand entrance with stone floors and an enormous, intricately carved door.'
+        }
         return prompt()
       }
       else console.log(`\nI don't see the ${item}\n`)
@@ -197,9 +225,13 @@ async function start() {
     // inspect function
     if (answer.includes('inspect')) {
       let item = answer.slice(7).trim()
+      if (item === 'map') {
+        console.log(mapText)
+        return prompt()
+      }
       if (player.inventory.includes(item) && item === 'phonebook') {
         if (itemLookUp[item].inspected === false) {
-          console.log(chalk.blueBright(itemLookUp[item].description))
+          textWrap((itemLookUp[item].description), 'blueBright')
           player.inventory.push('note')
           itemLookUp[item].description = 'A phonebook(a relic from a long time ago used for short people to sit on)'
           itemLookUp[item].inspected = true
@@ -207,7 +239,7 @@ async function start() {
         }
       }
       if (player.inventory.includes(item)) {
-        console.log('\n' + chalk.blueBright(itemLookUp[item].description) + '\n')
+        textWrap(('\n' + (itemLookUp[item].description) + '\n'), 'blueBright')
       } else if (item == '') {
         console.log(chalk.redBright(`\nWait, what are you trying to inspect?\n`))
         return prompt()
@@ -229,7 +261,7 @@ async function start() {
         player.currentRoom = lookUpTable[player.currentRoom][answer].room
         if (player.currentRoom === 'exit') {
           console.log(chalk.cyanBright(`Fresh air greets your lungs.  You've escaped.  You're safe. For now...\nOr something, whatever.  Sorry you had to play this.`))
-          console.log('\nTHANKS FOR PLAYING!!!!')
+          console.log(`\nTHANKS, ${player.name.toUpperCase()} !!!!`)
           process.exit()
         }
         return prompt()
