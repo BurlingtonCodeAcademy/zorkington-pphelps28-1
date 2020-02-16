@@ -19,7 +19,7 @@ function ask(questionText) {
 function textWrap(str, chalkStyle) {
   function readArray(array) {
     for (let line of array) {
-      console.log(chalk[chalkStyle](line))
+      console.log('\n' + chalk[chalkStyle](line))
     }
     return
   }
@@ -143,9 +143,9 @@ let coinArr = []
 let count = 0
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 start();
+//////////////////////////////////////////Game Start////////////////////////////////////////////////////////////////
+//AskName function bars progresss until user agrees to name input
 async function start() {
-  //////////////////////////////////////////Game Start////////////////////////////////////////////////////////////////
-  //AskName function bars progresss until user agrees to name input
   askName()
   async function askName() {
     let name = await ask("\nNow then...What's your name?\n")
@@ -156,7 +156,7 @@ async function start() {
       if (ans === 'y') {
         player.name = name
         textWrap((`\nHello, ${player.name}. type "c" at any time for a list of valid commands.  Now, let's begin.\n\n`), 'greenBright')
-        textWrap(lines, 'gray')
+        textWrap(lines, 'yellowBright')
         prompt()
       } else if (ans === 'n') {
         return askName()
@@ -169,10 +169,11 @@ async function start() {
   //////////////////////////////////////////////Gameplay////////////////////////////////////////////////////////////
 
   async function prompt() {
-    console.log(chalk.green('\nYou are currently in the ' + chalk.blueBright(lookUpTable[player.currentRoom].name)))
+    console.log(chalk.green('\rYou are currently in the ' + chalk.blueBright(lookUpTable[player.currentRoom].name)))
     textWrap((lookUpTable[player.currentRoom].description), 'yellowBright')
     let answer = await ask('\nWhat do you want to do?\n');
     answer = answer.trim().toLowerCase()
+    console.clear()
     //use function
     if (answer.includes(`use`)) {
       let item = answer.split('').slice(3).join('').trim()
@@ -239,7 +240,7 @@ async function start() {
     // inspect function
     if (answer.includes('inspect')) {
       let item = answer.slice(7).trim()
-      if (item === 'map' && player.inventory.includes(item) || lookUpTable[player.currentRoom].inventory.includes(item)) {
+      if (item === 'map' && (player.inventory.includes(item) || lookUpTable[player.currentRoom].inventory.includes(item))) {
         console.log(mapText)
         return prompt()
       }
@@ -257,7 +258,7 @@ async function start() {
       } else if (item == '') {
         console.log(chalk.redBright(`\nWait, what are you trying to inspect?\n`))
         return prompt()
-      } else console.log(chalk.redBright(`\nYou can't inspect the ${item} because there is no ${item}\n`))
+      } else console.log(chalk.redBright(`\nYou inspect the ${item}, but learn no new information from it\n`))
       return prompt()
     }
 
@@ -343,3 +344,7 @@ async function start() {
     return prompt()
   }
 }
+// game syntax, more use conditions; things that don't develop story but are fun.
+//play pool? rename items (corpse key)
+// change default 'inspect' dialogue
+//In room descriptions, have interactive items display in a different color
