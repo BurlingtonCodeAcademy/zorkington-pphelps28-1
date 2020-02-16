@@ -88,7 +88,7 @@ let exit = new Room('Exit', 'SUCCESS! FREEDOM!! SWEET, SWEET FREEDOM!!!!', [], '
 ///////////////////////////////////////////////////Item objects/////////////////////////////////////////////////////
 let boots = new Item('boots', "A pair of boots covered in dry, cracked mud")
 let coin = new Item('coin', 'A dull gold goin.  kinda spooky.')
-let phonebook = new Item('phonebook', 'A phonebook (a relic from a long time ago used for short people to sit on) that appears to have a note sticking out a little (note added to inventory)')
+let phonebook = new Item('phonebook', 'A phonebook (a relic from a long time ago used for short people to sit on) that appears to have a note sticking out a little\n (NOTE ADDED TO INVENTORY)')
 phonebook.inspected = false
 let phone = new Item('phone', 'An old phone with a dial on the front')
 let werthers = new Item('werther\'s originals', 'A hard, caramel candy that starts getting sent to you when you turn 60')
@@ -97,7 +97,7 @@ let corpseKey = new Item('corpse key', 'A small key found in the mouth of a decr
 let frontEntranceKey = new Item('front entrance key', 'A large, heavy ornate key.  Label says, "FRONT ENTRANCE"\nCould be your ticket out of here...')
 let liquor = new Item('liquor', 'A dusty bottle of scotch sitting on the bar')
 let poolCue = new Item('pool cue', 'A wooden pool cue leaning on the pool table')
-let note = new Item('note', 'A folded piece of paper with text that reads:\nPlace the coins where he weeps\nand his soul forever sleeps')
+let note = new Item('note', 'A folded piece of paper with text that reads:\nPlace the coins where he weeps and his soul forever sleeps')
 let map = new Item('map', mapText)
 let branCereal = new Item('bran cereal', 'lots of stuff to keep the body happy.  and like, really regular')
 //////////////////////////////////////////////////Player Object//////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ const itemLookUp = {
 }
 
 /////////////////////////////////////Reference arrays (for valid commands)///////////////////////////////////////////
-let ansArray = ['north', 'east', 'south', 'west', 'inventory', 'i', 'inspect', 'commands', 'c', 'examine room']
+let ansArray = ['north', 'east', 'south', 'west', 'inventory', 'i', 'inspect', 'commands', 'c', 'look around']
 let moveArr = ['north', 'east', 'south', 'west']
 let coinArr = []
 let count = 0
@@ -152,6 +152,7 @@ async function start() {
     if (name) {
       console.log(`\nYou entered: ${name}.\n`)
       let ans = await ask('Are you sure? (y/n)\n\n')
+      ans = ans.toLowerCase()
       if (ans === 'y') {
         player.name = name
         textWrap((`\nHello, ${player.name}. type "c" at any time for a list of valid commands.  Now, let's begin.\n\n`), 'greenBright')
@@ -238,7 +239,7 @@ async function start() {
     // inspect function
     if (answer.includes('inspect')) {
       let item = answer.slice(7).trim()
-      if (item === 'map') {
+      if (item === 'map' && player.inventory.includes(item) || lookUpTable[player.currentRoom].inventory.includes(item)) {
         console.log(mapText)
         return prompt()
       }
@@ -251,12 +252,12 @@ async function start() {
           return prompt()
         }
       }
-      if (player.inventory.includes(item)) {
+      if (player.inventory.includes(item) || lookUpTable[player.currentRoom].inventory.includes(item)) {
         textWrap(('\n' + (itemLookUp[item].description) + '\n'), 'blueBright')
       } else if (item == '') {
         console.log(chalk.redBright(`\nWait, what are you trying to inspect?\n`))
         return prompt()
-      } else console.log(chalk.redBright(`\nYou can't inspect the ${item} because you don't have the ${item}\n`))
+      } else console.log(chalk.redBright(`\nYou can't inspect the ${item} because there is no ${item}\n`))
       return prompt()
     }
 
@@ -274,9 +275,9 @@ async function start() {
       else {
         //if you're drunk, there's a <10%  you miss your move
         if (player.status == 'drunk') {
-          let chance = Math.round(Math.random((15 - 1)) + 1)
+          let chance = Math.round(Math.random() * (10 - 1) + 1)
           if (chance == 1) {
-            textWrap('The liquor causes you to stumble into the wall, missing your mark.  Embarassing\n', 'blueBright')
+            textWrap('\nThe liquor causes you to stumble into the wall, missing your mark.  Embarassing\n', 'blueBright')
             player.drunkcount++
             return prompt()
           }
@@ -292,7 +293,7 @@ async function start() {
         //win condition
         if (player.currentRoom === 'exit') {
           console.log(chalk.cyanBright(`Fresh air greets your lungs.  You've escaped.  You're safe. For now...\nOr something, whatever.  Sorry you had to play this.`))
-          console.log(`You beat it in ${count} moves`)
+          console.log(`You escaped in ${count} moves`)
           console.log(`\nTHANKS, ${player.name.toUpperCase()}!!!!`)
           process.exit()
         }
@@ -315,15 +316,15 @@ async function start() {
       "south"
       "west"
       "pick up [item]"
-      "inspect [item]" (if in inventory)
+      "inspect [item]"
       "drop [item]"
       "use [item]"
       "inventory" or "i"
-      "examine room"
+      "look around"
       `))
     }
-    //examine room function
-    if (answer === "examine room") {
+    //look around function
+    if (answer === "look around") {
       if (lookUpTable[player.currentRoom].inventory.length == 0) {
         console.log(chalk.yellowBright(`\nNothing of note in the ${chalk.blueBright(lookUpTable[player.currentRoom].name)}\n`))
         return prompt()
