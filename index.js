@@ -3,7 +3,7 @@ const readline = require('readline');
 const chalk = require('chalk')
 const readlineInterface = readline.createInterface(process.stdin, process.stdout);
 const fs = require('fs');
-//////////////////////Intro and map text///////////////////////////////
+//////////////////////Intro and map text//////////////////////////////////////
 const lines = fs.readFileSync('./read.txt').toString()
 const mapText = fs.readFileSync('./map.txt').toString()
 //////////////////////////////User Input Prompt//////////////////////////////////////////////
@@ -90,7 +90,7 @@ let boots = new Item('boots', "A pair of boots covered in dry, cracked mud")
 let coin = new Item('coin', 'A dull gold goin.  kinda spooky.')
 let phonebook = new Item('phonebook', 'A phonebook (a relic from a long time ago used for short people to sit on) that appears to have a note sticking out a little\n (NOTE ADDED TO INVENTORY)')
 phonebook.inspected = false
-let phone = new Item('phone', 'An old phone with a dial on the front')
+let phone = new Item('phone', 'An old phone with a dial on the front.  No dial')
 let werthers = new Item('werther\'s originals', 'A hard, caramel candy that starts getting sent to you when you turn 60')
 let pruneJuice = new Item('prune juice', 'Gross')
 let corpseKey = new Item('corpse key', 'A small key found in the mouth of a decrepit corpse')
