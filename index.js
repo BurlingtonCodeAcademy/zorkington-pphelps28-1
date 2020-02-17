@@ -83,7 +83,7 @@ let upstairsHall = new Room('Upstairs Hall', 'Hall at the top of the stairs lead
 let kitchen = new Room('Kitchen', 'Dusty, old kitchen full of rats and spiders with dishes and utensils left like they were suddenly abandoned', ['coin'], 'pantry', false, false, 'mainHall')
 let pantry = new Room('Pantry', 'Closet with untouched, probably expired food', ['werther\'s originals', 'prune juice', 'bran cereal'], false, false, 'kitchen', false)
 let bedroom = new Room('Bedroom', 'Scary looking bedroom with broken windows and a corpse lying in the four-post bed in the center of the room', [], false, false, 'upstairsHall', false)
-let lounge = new Room('Lounge', 'A one-time classy lounge with an enormous bar, bookshelves, a fireplace and a billiards table.', ['key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
+let lounge = new Room('Lounge', 'A one-time classy lounge with an enormous bar, bookshelves, a fireplace and a billiards table.', ['front entrance key', 'liquor', 'pool cue'], false, 'mainHall', false, false)
 let exit = new Room('Exit', 'SUCCESS! FREEDOM!! SWEET, SWEET FREEDOM!!!!', [], 'entrance', false, false, false)
 ///////////////////////////////////////////////////Item objects/////////////////////////////////////////////////////
 let boots = new Item('boots', "A pair of boots covered in dry, cracked mud")
@@ -93,7 +93,7 @@ phonebook.inspected = false
 let phone = new Item('phone', 'An old phone with a dial on the front')
 let werthers = new Item('werther\'s originals', 'A hard, caramel candy that starts getting sent to you when you turn 60')
 let pruneJuice = new Item('prune juice', 'Gross')
-let corpseKey = new Item('corpse key', 'A small key found in the mouth of a decrepit corpse')
+let corpseKey = new Item('key', 'A small key found in the mouth of a decrepit corpse')
 let frontEntranceKey = new Item('front entrance key', 'A large, heavy ornate key.  Label says, "FRONT ENTRANCE"\nCould be your ticket out of here...')
 let liquor = new Item('liquor', 'A dusty bottle of scotch sitting on the bar')
 let poolCue = new Item('pool cue', 'A wooden pool cue leaning on the pool table')
@@ -127,8 +127,8 @@ const itemLookUp = {
   'phone': phone,
   'werther\'s originals': werthers,
   'prune juice': pruneJuice,
-  'corpse key': corpseKey,
-  'key': frontEntranceKey,
+  'key': corpseKey,
+  'front entrance key': frontEntranceKey,
   'liquor': liquor,
   'pool cue': poolCue,
   'note': note,
@@ -188,7 +188,7 @@ async function start() {
         player.drunkcount = 0
         return prompt()
       }
-      if (player.inventory.includes(item) && item === 'corpse key' && player.currentRoom === 'mainHall') {
+      if (player.inventory.includes(item) && item === 'key' && player.currentRoom === 'mainHall') {
         mainHall.west.locked = false
         console.log(chalk.blueBright(`\nYou hear a *click*.  The door appears to be unlocked!\n`))
         return prompt()
@@ -200,13 +200,13 @@ async function start() {
         if (coinArr.length === 2) {
           console.log(chalk.blueBright(`You place the second coin on the corpse's remaining eye.\nIt's mouth slowly opens, revealing a key.\n`))
           lookUpTable[player.currentRoom].description = 'Scary looking bedroom with broken windows and a corpse with a coin on each eye lying in the four-post bed in the center of the room'
-          lookUpTable[player.currentRoom].inventory.push('corpse key')
+          lookUpTable[player.currentRoom].inventory.push('key')
           return prompt()
         }
         console.log(chalk.blueBright(`You place a coin on the corpses eye.\nYou swear you feel some breath escape it's lungs\n`))
         return prompt()
       }
-      if (player.inventory.includes(item) && player.currentRoom === 'entrance' && item === 'key') {
+      if (player.inventory.includes(item) && player.currentRoom === 'entrance' && item === 'front entrance key') {
         entrance.south.locked = false
         console.log(chalk.blueBright(`The key fits perfectly.  You turn it, and unlock the door with a satisfying *click*`))
         return prompt()
