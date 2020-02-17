@@ -6,7 +6,6 @@ const fs = require('fs');
 //////////////////////Intro and map text///////////////////////////////
 const lines = fs.readFileSync('./read.txt').toString()
 const mapText = fs.readFileSync('./map.txt').toString()
-
 //////////////////////////////User Input Prompt//////////////////////////////////////////////
 function ask(questionText) {
   return new Promise((resolve, reject) => {
@@ -21,6 +20,7 @@ function textWrap(str, chalkStyle) {
     for (let line of array) {
       console.log('\n' + chalk[chalkStyle](line))
     }
+    console.log('\n')
     return
   }
   let num = Math.round(process.stdout.columns * .95)
@@ -155,7 +155,7 @@ async function start() {
       ans = ans.toLowerCase()
       if (ans === 'y') {
         player.name = name
-        textWrap((`\nHello, ${player.name}. type "c" at any time for a list of valid commands.  Now, let's begin.\n\n`), 'greenBright')
+        textWrap((`Hello, ${player.name}. Now, let's begin.`), 'greenBright')
         textWrap(lines, 'yellowBright')
         prompt()
       } else if (ans === 'n') {
@@ -169,7 +169,8 @@ async function start() {
   //////////////////////////////////////////////Gameplay////////////////////////////////////////////////////////////
 
   async function prompt() {
-    console.log(chalk.green('\rYou are currently in the ' + chalk.blueBright(lookUpTable[player.currentRoom].name)))
+    console.log(chalk.greenBright('\rYou are currently in the ' + chalk.blueBright(lookUpTable[player.currentRoom].name)))
+    textWrap('Type "c" at any time for a list of valid commands.', 'greenBright')
     textWrap((lookUpTable[player.currentRoom].description), 'yellowBright')
     let answer = await ask('\nWhat do you want to do?\n');
     answer = answer.trim().toLowerCase()
@@ -240,6 +241,7 @@ async function start() {
     // inspect function
     if (answer.includes('inspect')) {
       let item = answer.slice(7).trim()
+      const regex = new RegExp(`\\b` + item + `\\b`)
       if (item === 'map' && (player.inventory.includes(item) || lookUpTable[player.currentRoom].inventory.includes(item))) {
         console.log(mapText)
         return prompt()
@@ -255,11 +257,17 @@ async function start() {
       }
       if (player.inventory.includes(item) || lookUpTable[player.currentRoom].inventory.includes(item)) {
         textWrap(('\n' + (itemLookUp[item].description) + '\n'), 'blueBright')
+        return prompt()
       } else if (item == '') {
         console.log(chalk.redBright(`\nWait, what are you trying to inspect?\n`))
         return prompt()
-      } else console.log(chalk.redBright(`\nYou inspect the ${item}, but learn no new information from it\n`))
-      return prompt()
+      } else if (regex.test(lookUpTable[player.currentRoom].description)) {
+        textWrap(`\nYou inspect the ${item}, but learn no new information from it\n`, 'blueBright')
+        return prompt()
+      } else {
+        console.log(chalk.redBright(`\n${item}?? I don't see that...\n`))
+        return prompt()
+      }
     }
 
     //move function (checks if room is locked, or if it exists at all)
@@ -276,15 +284,16 @@ async function start() {
       else {
         //if you're drunk, there's a <10%  you miss your move
         if (player.status == 'drunk') {
+          //random number within range
           let chance = Math.round(Math.random() * (10 - 1) + 1)
-          if (chance == 1) {
+          if (chance === 1) {
             textWrap('\nThe liquor causes you to stumble into the wall, missing your mark.  Embarassing\n', 'blueBright')
             player.drunkcount++
             return prompt()
           }
           player.drunkcount++
           if (player.drunkcount >= 5) {
-            console.log(`\nYour buzz has worn off`)
+            console.log(`\nYour buzz has worn off.  Maybe focus on escape.`)
             player.status = ''
           }
           //sets player to new room
@@ -311,7 +320,10 @@ async function start() {
     }
     //commands function
     if (answer === "commands" || answer === "c") {
+      let width = process.stdout.columns
       console.log(chalk.yellow(`
+      VALID COMMANDS
+
       "north"
       "east"
       "south"
